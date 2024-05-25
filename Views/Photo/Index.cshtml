@@ -1,0 +1,92 @@
+﻿@model List<PhotoGalleryApp.Models.Photo>
+@{
+    ViewBag.Title = "Photo Gallery";
+    int page = ViewBag.Page ?? 1; // Valor predeterminado 1 si ViewBag.Page es null
+    int pageSize = ViewBag.PageSize ?? 10; // Valor predeterminado 10 si ViewBag.PageSize es null
+    int totalPhotos = ViewBag.TotalPhotos ?? 0;
+    int totalPages = (int)Math.Ceiling((double)totalPhotos / pageSize);
+}
+
+<h1>Photo Gallery</h1>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Title</th>
+            <th>Thumbnail</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var photo in Model)
+        {
+            <tr>
+                <td>@photo.Title</td>
+                <td><a href="@photo.Url" target="_blank"><img src="@photo.ThumbnailUrl" alt="@photo.Title" /></a></td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+
+<div>
+    <ul class="pagination">
+        @if (page > 3)
+        {
+            <li class="page-item">
+                <a class="page-link" asp-action="Index" asp-route-page="1" asp-route-pageSize="@pageSize">1</a>
+            </li>
+            <li class="page-item disabled">
+                <span class="page-link">...</span>
+            </li>
+        }
+
+        @for (int i = Math.Max(1, page - 1); i <= Math.Min(page + 1, totalPages); i++)
+        {
+            <li class="page-item @(i == page ? "active" : "")">
+                <a class="page-link" asp-action="Index" asp-route-page="@i" asp-route-pageSize="@pageSize">@i</a>
+            </li>
+        }
+
+        @if (page < totalPages - 2)
+        {
+            <li class="page-item disabled">
+                <span class="page-link">...</span>
+            </li>
+            <li class="page-item">
+                <a class="page-link" asp-action="Index" asp-route-page="@totalPages" asp-route-pageSize="@pageSize">@totalPages</a>
+            </li>
+        }
+    </ul>
+    <form method="get"> Items per page: <input type="number" name="pageSize" value="@pageSize" min="1" /> <input type="submit" value="Set" /> </form>
+</div>
+
+<div>
+    <form method="get"> Go to page: <input type="number" name="page" value="@(page)" min="1" max="@totalPages" /> <input type="hidden" name="pageSize" value="@pageSize" /> <input type="submit" value="Go" /> </form>
+</div>
+
+<style>
+    .pagination {
+        list-style-type: none;
+        padding: 0;
+        display: flex;
+        gap: 5px;
+    }
+
+    .page-item {
+        display: inline;
+    }
+
+    .page-link {
+        display: inline-block;
+        padding: 5px 10px;
+        border: 1px solid #ddd;
+        text-decoration: none;
+        color: #007bff;
+    }
+
+    .page-item.active .page-link {
+        background-color: #007bff;
+        color: white;
+    }
+</style>
+
